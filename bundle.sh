@@ -21,7 +21,7 @@ APP=dist/picoTranslator.app
 
 FLAGS="-c release --arch arm64 --arch x86_64 -Xswiftc -Osize"
 swift build $FLAGS
-rm -rf dist && mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
+rm -rf "$APP" dist/dmg && mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"  # keeps the other mode's output
 cp "$(swift build $FLAGS --show-bin-path)/picoTranslator" "$APP/Contents/MacOS/"
 cp Info.plist "$APP/Contents/"
 cp Resources/AppIcon.icns "$APP/Contents/Resources/"
@@ -41,6 +41,7 @@ if [ "$MODE" = appstore ]; then
     codesign --force --options runtime --entitlements dist/appstore.entitlements -s "${APP_ID:-Apple Distribution}" "$APP"
     # The installer certificate goes by either name, depending on when it was made.
     INSTALLER_ID=${INSTALLER_ID:-$(security find-identity -v | grep -oE '"(Mac Installer Distribution|3rd Party Mac Developer Installer)[^"]*"' | head -1 | tr -d '"')}
+    rm -f dist/picoTranslator.pkg
     productbuild --component "$APP" /Applications --sign "$INSTALLER_ID" dist/picoTranslator.pkg
     echo "Built dist/picoTranslator.pkg (build $BUILD). Upload it to App Store Connect with Transporter."
 else
@@ -48,6 +49,7 @@ else
     codesign --force --options runtime --timestamp --entitlements picoTranslator.entitlements -s "$ID" "$APP"
     # A disk image with the app and an Applications shortcut to drag it onto.
     mkdir dist/dmg && mv "$APP" dist/dmg/ && ln -s /Applications dist/dmg/Applications
+    rm -f dist/picoTranslator.dmg
     hdiutil create -volname picoTranslator -srcfolder dist/dmg -format UDZO -quiet dist/picoTranslator.dmg
     rm -rf dist/dmg
     codesign --timestamp -s "$ID" dist/picoTranslator.dmg

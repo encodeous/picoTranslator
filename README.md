@@ -6,6 +6,8 @@
 
 <p align="center">A tiny, no-frills translator for macOS.</p>
 
+<p align="center">English · <a href="README.zh-CN.md">简体中文</a></p>
+
 <p align="center">
   <img src="assets/screenshots/translator.png" width="560" alt="picoTranslator translating a line of English from a sticky note into Chinese">
 </p>

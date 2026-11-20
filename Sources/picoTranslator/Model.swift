@@ -154,7 +154,12 @@ enum Translator {
         let preferred = Set(Locale.preferredLanguages.map { nlLanguage(Locale.Language(identifier: $0)) })
         r.languageConstraints = Array(supported)
         r.languageHints = Dictionary(uniqueKeysWithValues: supported.map { ($0, preferred.contains($0) ? 10 : 1) })
-        r.processString(text)
+        // Latin words outweigh Chinese, Japanese and Korean characters, so "picoTranslator真的非常轻" came
+        // out as Dutch. Mixed in like that, Latin words are usually names: judge by the other characters.
+        let cjk = String(String.UnicodeScalarView(text.unicodeScalars.filter {
+            $0.properties.isIdeographic || (0x3040...0x30FF).contains($0.value) || (0xAC00...0xD7AF).contains($0.value)
+        }))
+        r.processString(cjk.count >= 2 ? cjk : text)
         guard let language = r.dominantLanguage, language != .undetermined else { return nil }
         return Locale.Language(identifier: language.rawValue)
     }

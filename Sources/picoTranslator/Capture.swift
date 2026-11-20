@@ -224,6 +224,9 @@ enum TextReader {
         let request = VNRecognizeTextRequest()
         request.recognitionLevel = .accurate
         request.automaticallyDetectsLanguage = true
+        // Detection judges a line by how it starts, so "picoTranslator真的非常轻" read as English and the
+        // Chinese was lost. Listing Chinese, Japanese and Korean first fixes that, and Latin text still reads the same.
+        request.recognitionLanguages = ["zh-Hans", "zh-Hant", "ja-JP", "ko-KR", "en-US"]
         try? handler.perform([request])
         return (request.results ?? []).compactMap { $0.topCandidates(1).first?.string }.joined(separator: "\n")
     }

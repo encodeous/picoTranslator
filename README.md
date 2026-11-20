@@ -7,7 +7,7 @@
 <p align="center">A tiny, no-frills translator for macOS.</p>
 
 <p align="center">
-  <img src="assets/screenshots/translator.png" width="560" alt="picoTranslator reading a line of English from a sticky note and translating it into Chinese">
+  <img src="assets/screenshots/translator.png" width="560" alt="picoTranslator translating a line of English from a sticky note into Chinese">
 </p>
 
 ## picoTranslator is really, really lightweight

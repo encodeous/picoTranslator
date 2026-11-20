@@ -24,7 +24,7 @@ swift build $FLAGS
 rm -rf "$APP" dist/dmg && mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"  # keeps the other mode's output
 cp "$(swift build $FLAGS --show-bin-path)/picoTranslator" "$APP/Contents/MacOS/"
 cp Info.plist "$APP/Contents/"
-cp Resources/AppIcon.icns "$APP/Contents/Resources/"
+cp -R Resources/. "$APP/Contents/Resources/"  # icon and translations (*.lproj)
 plutil -replace CFBundleVersion -string "$BUILD" "$APP/Contents/Info.plist"
 strip -x "$APP/Contents/MacOS/picoTranslator"
 

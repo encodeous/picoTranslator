@@ -1,0 +1,61 @@
+/* Menu bar icon's menu, and window titles */
+"Settings…" = "Impostazioni…";
+"About picoTranslator" = "Informazioni su picoTranslator";
+"Quit picoTranslator" = "Esci da picoTranslator";
+"picoTranslator Settings" = "Impostazioni di picoTranslator";
+"Welcome" = "Benvenuto";
+
+/* Translator: text areas, status and placeholders */
+"Enter text" = "Inserisci testo";
+"Translation" = "Traduzione";
+"Reading text…" = "Lettura del testo…";
+"Translating…" = "Traduzione in corso…";
+"No text found in the selected area." = "Nessun testo trovato nell'area selezionata.";
+"Reading the text is taking too long. macOS may still be preparing text recognition, so try again in a moment." = "La lettura del testo richiede troppo tempo. macOS potrebbe ancora preparare il riconoscimento del testo: riprova tra poco.";
+
+/* Translator: language menus. %@ is a language name, e.g. "English (Detected)" */
+"From" = "Da";
+"To" = "A";
+"Detect Language" = "Rileva lingua";
+"%@ (Detected)" = "%@ (rilevata)";
+"Automatic" = "Automatica";
+"%@ (Automatic)" = "%@ (automatica)";
+
+/* Translator: buttons and tooltips */
+"Swap Languages" = "Inverti lingue";
+"Copy Text" = "Copia testo";
+"Copy Translation" = "Copia traduzione";
+"Read Aloud" = "Leggi ad alta voce";
+"Stop Speaking" = "Interrompi lettura";
+"Close" = "Chiudi";
+
+/* Translator: errors. The two %@ are language names (source, then target); reorder with %1$@ and %2$@ if needed */
+"Couldn't detect the language." = "Impossibile rilevare la lingua.";
+"Choose a language to translate into." = "Scegli una lingua di destinazione.";
+"Translating %@ to %@ isn't supported." = "La traduzione %1$@ → %2$@ non è supportata.";
+"%@ to %@ isn't set up on this Mac yet." = "La coppia %1$@ → %2$@ non è ancora configurata su questo Mac.";
+"Download in Language & Region › Translation Languages…" = "Scarica in Lingua e zona › Lingue di traduzione…";
+
+/* Welcome window and Settings. "Language & Region" and "Translation Languages…" are names in macOS System Settings: use macOS's own translations */
+"Welcome to picoTranslator" = "Benvenuto in picoTranslator";
+"Translate text on screen, or type it in." = "Traduci il testo sullo schermo o digitalo.";
+"Done" = "Fine";
+"Permissions" = "Permessi";
+"Languages" = "Lingue";
+"Shortcuts" = "Abbreviazioni";
+"Screen Recording" = "Registrazione schermo";
+"Needed to read text from screenshots." = "Necessaria per leggere il testo dalle istantanee dello schermo.";
+"Allow" = "Consenti";
+"Allowed" = "Consentita";
+"Open Settings…" = "Apri Impostazioni…";
+"Translation languages" = "Lingue di traduzione";
+"Open…" = "Apri…";
+"In Language & Region, click Translation Languages… and download the ones you use." = "In Lingua e zona, fai clic su Lingue di traduzione… e scarica quelle che usi.";
+"Translate screenshot" = "Traduci istantanea";
+"Select an area to read and translate." = "Seleziona un'area da leggere e tradurre.";
+"Open translator" = "Apri traduttore";
+"Type or paste text to translate." = "Digita o incolla il testo da tradurre.";
+"Launch at login" = "Apri al login";
+"Listening…" = "In ascolto…";
+"Click, then press the new shortcut. Esc cancels." = "Fai clic, poi premi la nuova abbreviazione. Esc per annullare.";
+"Another app already uses this shortcut. Click to choose a different one." = "Un'altra app usa già questa abbreviazione. Fai clic per sceglierne un'altra.";

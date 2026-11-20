@@ -1,0 +1,61 @@
+/* Menu bar icon's menu, and window titles */
+"Settings…" = "設定…";
+"About picoTranslator" = "關於 picoTranslator";
+"Quit picoTranslator" = "結束 picoTranslator";
+"picoTranslator Settings" = "picoTranslator 設定";
+"Welcome" = "歡迎";
+
+/* Translator: text areas, status and placeholders */
+"Enter text" = "輸入文字";
+"Translation" = "譯文";
+"Reading text…" = "正在辨識文字…";
+"Translating…" = "正在翻譯…";
+"No text found in the selected area." = "所選區域中找不到文字。";
+"Reading the text is taking too long. macOS may still be preparing text recognition, so try again in a moment." = "辨識文字花費太久時間。macOS 可能仍在準備文字辨識功能，請稍後再試一次。";
+
+/* Translator: language menus. %@ is a language name, e.g. "English (Detected)" */
+"From" = "來源語言";
+"To" = "目標語言";
+"Detect Language" = "偵測語言";
+"%@ (Detected)" = "%@（已偵測）";
+"Automatic" = "自動";
+"%@ (Automatic)" = "%@（自動）";
+
+/* Translator: buttons and tooltips */
+"Swap Languages" = "交換語言";
+"Copy Text" = "拷貝原文";
+"Copy Translation" = "拷貝譯文";
+"Read Aloud" = "朗讀";
+"Stop Speaking" = "停止朗讀";
+"Close" = "關閉";
+
+/* Translator: errors. The two %@ are language names (source, then target); reorder with %1$@ and %2$@ if needed */
+"Couldn't detect the language." = "無法偵測語言。";
+"Choose a language to translate into." = "請選擇要翻譯成的語言。";
+"Translating %@ to %@ isn't supported." = "不支援將%1$@翻譯成%2$@。";
+"%@ to %@ isn't set up on this Mac yet." = "這部 Mac 尚未設定從%1$@到%2$@的翻譯。";
+"Download in Language & Region › Translation Languages…" = "在「語言與地區」›「翻譯語言…」中下載";
+
+/* Welcome window and Settings. "Language & Region" and "Translation Languages…" are names in macOS System Settings: use macOS's own translations */
+"Welcome to picoTranslator" = "歡迎使用 picoTranslator";
+"Translate text on screen, or type it in." = "翻譯螢幕上的文字，或直接輸入。";
+"Done" = "完成";
+"Permissions" = "權限";
+"Languages" = "語言";
+"Shortcuts" = "快速鍵";
+"Screen Recording" = "螢幕錄製";
+"Needed to read text from screenshots." = "用於讀取截圖中的文字。";
+"Allow" = "允許";
+"Allowed" = "已允許";
+"Open Settings…" = "打開設定…";
+"Translation languages" = "翻譯語言";
+"Open…" = "打開…";
+"In Language & Region, click Translation Languages… and download the ones you use." = "在「語言與地區」中按一下「翻譯語言…」，然後下載你需要的語言。";
+"Translate screenshot" = "翻譯截圖";
+"Select an area to read and translate." = "選取一個區域，辨識並翻譯其中的文字。";
+"Open translator" = "打開翻譯器";
+"Type or paste text to translate." = "輸入或貼上要翻譯的文字。";
+"Launch at login" = "登入時啟動";
+"Listening…" = "請按快速鍵…";
+"Click, then press the new shortcut. Esc cancels." = "按一下，然後按下新的快速鍵。按 Esc 鍵取消。";
+"Another app already uses this shortcut. Click to choose a different one." = "另一個 App 已在使用此快速鍵。按一下以選擇其他快速鍵。";

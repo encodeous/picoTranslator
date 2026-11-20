@@ -52,10 +52,10 @@ import SwiftUI
     func applicationDidFinishLaunching(_: Notification) {
         item.button?.image = Self.menuBarIcon()
         let menu = NSMenu()
-        menu.addItem(withTitle: "Settings…", action: #selector(openSettings), keyEquivalent: ",").target = self
-        menu.addItem(withTitle: "About picoTranslator", action: #selector(about), keyEquivalent: "").target = self
+        menu.addItem(withTitle: String(localized: "Settings…"), action: #selector(openSettings), keyEquivalent: ",").target = self
+        menu.addItem(withTitle: String(localized: "About picoTranslator"), action: #selector(about), keyEquivalent: "").target = self
         menu.addItem(.separator())
-        menu.addItem(withTitle: "Quit picoTranslator", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        menu.addItem(withTitle: String(localized: "Quit picoTranslator"), action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         item.menu = menu
 
         resetPopover()
@@ -106,9 +106,9 @@ import SwiftUI
                 model.input = text
                 await model.translateNow()
             case .noText:
-                model.showMessage("No text found in the selected area.")
+                model.showMessage(String(localized: "No text found in the selected area."))
             case .timedOut:
-                model.showMessage("Reading the text is taking too long. macOS may still be preparing text recognition, so try again in a moment.")
+                model.showMessage(String(localized: "Reading the text is taking too long. macOS may still be preparing text recognition, so try again in a moment."))
             }
         }
     }
@@ -223,14 +223,14 @@ import SwiftUI
 
     // MARK: Windows
 
-    @objc func openSettings() { showForm(SetupForm(m: model), title: "picoTranslator Settings") }
+    @objc func openSettings() { showForm(SetupForm(m: model), title: String(localized: "picoTranslator Settings")) }
 
     /// Shown at every launch until Done is pressed, since granting Screen Recording relaunches the app.
     func openWelcome() {
         showForm(WelcomeView(m: model) { [weak self] in
             UserDefaults.standard.set(true, forKey: "setupDone")
             self?.formWindow?.close()
-        }, title: "Welcome", fullSize: true)
+        }, title: String(localized: "Welcome"), fullSize: true)
     }
 
     /// Settings and Welcome share one window, centred on the display with the cursor.

@@ -1,0 +1,61 @@
+/* Menu bar icon's menu, and window titles */
+"Settings…" = "設定…";
+"About picoTranslator" = "picoTranslatorについて";
+"Quit picoTranslator" = "picoTranslatorを終了";
+"picoTranslator Settings" = "picoTranslator設定";
+"Welcome" = "ようこそ";
+
+/* Translator: text areas, status and placeholders */
+"Enter text" = "テキストを入力";
+"Translation" = "翻訳";
+"Reading text…" = "テキストを認識中…";
+"Translating…" = "翻訳中…";
+"No text found in the selected area." = "選択した領域にテキストが見つかりません。";
+"Reading the text is taking too long. macOS may still be preparing text recognition, so try again in a moment." = "テキストの認識に時間がかかりすぎています。macOSがテキスト認識を準備中の可能性があります。しばらくしてからもう一度お試しください。";
+
+/* Translator: language menus. %@ is a language name, e.g. "English (Detected)" */
+"From" = "翻訳元";
+"To" = "翻訳先";
+"Detect Language" = "言語を検出";
+"%@ (Detected)" = "%@（検出）";
+"Automatic" = "自動";
+"%@ (Automatic)" = "%@（自動）";
+
+/* Translator: buttons and tooltips */
+"Swap Languages" = "言語を入れ替える";
+"Copy Text" = "原文をコピー";
+"Copy Translation" = "翻訳をコピー";
+"Read Aloud" = "読み上げ";
+"Stop Speaking" = "読み上げを停止";
+"Close" = "閉じる";
+
+/* Translator: errors. The two %@ are language names (source, then target); reorder with %1$@ and %2$@ if needed */
+"Couldn't detect the language." = "言語を検出できませんでした。";
+"Choose a language to translate into." = "翻訳先の言語を選択してください。";
+"Translating %@ to %@ isn't supported." = "%1$@から%2$@への翻訳はサポートされていません。";
+"%@ to %@ isn't set up on this Mac yet." = "このMacでは%1$@から%2$@への翻訳がまだ設定されていません。";
+"Download in Language & Region › Translation Languages…" = "「言語と地域」›「翻訳言語…」でダウンロード";
+
+/* Welcome window and Settings. "Language & Region" and "Translation Languages…" are names in macOS System Settings: use macOS's own translations */
+"Welcome to picoTranslator" = "picoTranslatorへようこそ";
+"Translate text on screen, or type it in." = "画面上のテキストを翻訳したり、入力して翻訳したりできます。";
+"Done" = "完了";
+"Permissions" = "アクセス権";
+"Languages" = "言語";
+"Shortcuts" = "ショートカット";
+"Screen Recording" = "画面収録";
+"Needed to read text from screenshots." = "スクリーンショットからテキストを読み取るために必要です。";
+"Allow" = "許可";
+"Allowed" = "許可済み";
+"Open Settings…" = "設定を開く…";
+"Translation languages" = "翻訳言語";
+"Open…" = "開く…";
+"In Language & Region, click Translation Languages… and download the ones you use." = "「言語と地域」で「翻訳言語…」をクリックし、使用する言語をダウンロードしてください。";
+"Translate screenshot" = "スクリーンショットを翻訳";
+"Select an area to read and translate." = "読み取って翻訳する領域を選択します。";
+"Open translator" = "翻訳ウインドウを開く";
+"Type or paste text to translate." = "翻訳するテキストを入力またはペーストします。";
+"Launch at login" = "ログイン時に起動";
+"Listening…" = "キーを入力…";
+"Click, then press the new shortcut. Esc cancels." = "クリックしてから新しいショートカットを押します。Escキーでキャンセルします。";
+"Another app already uses this shortcut. Click to choose a different one." = "このショートカットはほかのアプリで使用されています。クリックして別のショートカットを選択してください。";

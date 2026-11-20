@@ -1,0 +1,61 @@
+/* Menu bar icon's menu, and window titles */
+"Settings…" = "Settings…";
+"About picoTranslator" = "About picoTranslator";
+"Quit picoTranslator" = "Quit picoTranslator";
+"picoTranslator Settings" = "picoTranslator Settings";
+"Welcome" = "Welcome";
+
+/* Translator: text areas, status and placeholders */
+"Enter text" = "Enter text";
+"Translation" = "Translation";
+"Reading text…" = "Reading text…";
+"Translating…" = "Translating…";
+"No text found in the selected area." = "No text found in the selected area.";
+"Reading the text is taking too long. macOS may still be preparing text recognition, so try again in a moment." = "Reading the text is taking too long. macOS may still be preparing text recognition, so try again in a moment.";
+
+/* Translator: language menus. %@ is a language name, e.g. "English (Detected)" */
+"From" = "From";
+"To" = "To";
+"Detect Language" = "Detect Language";
+"%@ (Detected)" = "%@ (Detected)";
+"Automatic" = "Automatic";
+"%@ (Automatic)" = "%@ (Automatic)";
+
+/* Translator: buttons and tooltips */
+"Swap Languages" = "Swap Languages";
+"Copy Text" = "Copy Text";
+"Copy Translation" = "Copy Translation";
+"Read Aloud" = "Read Aloud";
+"Stop Speaking" = "Stop Speaking";
+"Close" = "Close";
+
+/* Translator: errors. The two %@ are language names (source, then target); reorder with %1$@ and %2$@ if needed */
+"Couldn't detect the language." = "Couldn't detect the language.";
+"Choose a language to translate into." = "Choose a language to translate into.";
+"Translating %@ to %@ isn't supported." = "Translating %@ to %@ isn't supported.";
+"%@ to %@ isn't set up on this Mac yet." = "%@ to %@ isn't set up on this Mac yet.";
+"Download in Language & Region › Translation Languages…" = "Download in Language & Region › Translation Languages…";
+
+/* Welcome window and Settings. "Language & Region" and "Translation Languages…" are names in macOS System Settings: use macOS's own translations */
+"Welcome to picoTranslator" = "Welcome to picoTranslator";
+"Translate text on screen, or type it in." = "Translate text on screen, or type it in.";
+"Done" = "Done";
+"Permissions" = "Permissions";
+"Languages" = "Languages";
+"Shortcuts" = "Shortcuts";
+"Screen Recording" = "Screen Recording";
+"Needed to read text from screenshots." = "Needed to read text from screenshots.";
+"Allow" = "Allow";
+"Allowed" = "Allowed";
+"Open Settings…" = "Open Settings…";
+"Translation languages" = "Translation languages";
+"Open…" = "Open…";
+"In Language & Region, click Translation Languages… and download the ones you use." = "In Language & Region, click Translation Languages… and download the ones you use.";
+"Translate screenshot" = "Translate screenshot";
+"Select an area to read and translate." = "Select an area to read and translate.";
+"Open translator" = "Open translator";
+"Type or paste text to translate." = "Type or paste text to translate.";
+"Launch at login" = "Launch at login";
+"Listening…" = "Listening…";
+"Click, then press the new shortcut. Esc cancels." = "Click, then press the new shortcut. Esc cancels.";
+"Another app already uses this shortcut. Click to choose a different one." = "Another app already uses this shortcut. Click to choose a different one.";

@@ -11,7 +11,7 @@ APP=build/picoTranslator.app
 rm -rf "$APP" && mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp .build/release/picoTranslator "$APP/Contents/MacOS/"
 cp Info.plist "$APP/Contents/"
-cp Resources/AppIcon.icns "$APP/Contents/Resources/"
+cp -R Resources/. "$APP/Contents/Resources/"  # icon and translations (*.lproj)
 strip -x "$APP/Contents/MacOS/picoTranslator"
 
 if [ -z "$SIGN_ID" ]; then

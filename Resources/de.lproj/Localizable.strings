@@ -1,0 +1,61 @@
+/* Menu bar icon's menu, and window titles */
+"Settings…" = "Einstellungen …";
+"About picoTranslator" = "Über picoTranslator";
+"Quit picoTranslator" = "picoTranslator beenden";
+"picoTranslator Settings" = "picoTranslator-Einstellungen";
+"Welcome" = "Willkommen";
+
+/* Translator: text areas, status and placeholders */
+"Enter text" = "Text eingeben";
+"Translation" = "Übersetzung";
+"Reading text…" = "Text wird gelesen …";
+"Translating…" = "Wird übersetzt …";
+"No text found in the selected area." = "Im ausgewählten Bereich wurde kein Text gefunden.";
+"Reading the text is taking too long. macOS may still be preparing text recognition, so try again in a moment." = "Das Lesen des Texts dauert zu lange. macOS bereitet möglicherweise noch die Texterkennung vor. Bitte gleich erneut versuchen.";
+
+/* Translator: language menus. %@ is a language name, e.g. "English (Detected)" */
+"From" = "Von";
+"To" = "Nach";
+"Detect Language" = "Sprache erkennen";
+"%@ (Detected)" = "%@ (erkannt)";
+"Automatic" = "Automatisch";
+"%@ (Automatic)" = "%@ (automatisch)";
+
+/* Translator: buttons and tooltips */
+"Swap Languages" = "Sprachen tauschen";
+"Copy Text" = "Text kopieren";
+"Copy Translation" = "Übersetzung kopieren";
+"Read Aloud" = "Vorlesen";
+"Stop Speaking" = "Sprechen stoppen";
+"Close" = "Schließen";
+
+/* Translator: errors. The two %@ are language names (source, then target); reorder with %1$@ and %2$@ if needed */
+"Couldn't detect the language." = "Die Sprache konnte nicht erkannt werden.";
+"Choose a language to translate into." = "Zielsprache auswählen.";
+"Translating %@ to %@ isn't supported." = "Die Übersetzung von %1$@ nach %2$@ wird nicht unterstützt.";
+"%@ to %@ isn't set up on this Mac yet." = "%1$@ nach %2$@ ist auf diesem Mac noch nicht eingerichtet.";
+"Download in Language & Region › Translation Languages…" = "Unter „Sprache & Region“ › „Übersetzungssprachen …“ laden";
+
+/* Welcome window and Settings. "Language & Region" and "Translation Languages…" are names in macOS System Settings: use macOS's own translations */
+"Welcome to picoTranslator" = "Willkommen bei picoTranslator";
+"Translate text on screen, or type it in." = "Text auf dem Bildschirm übersetzen oder eingeben.";
+"Done" = "Fertig";
+"Permissions" = "Berechtigungen";
+"Languages" = "Sprachen";
+"Shortcuts" = "Tastaturkurzbefehle";
+"Screen Recording" = "Bildschirmaufnahme";
+"Needed to read text from screenshots." = "Erforderlich, um Text aus Bildschirmfotos zu lesen.";
+"Allow" = "Erlauben";
+"Allowed" = "Erlaubt";
+"Open Settings…" = "Einstellungen öffnen …";
+"Translation languages" = "Übersetzungssprachen";
+"Open…" = "Öffnen …";
+"In Language & Region, click Translation Languages… and download the ones you use." = "Unter „Sprache & Region“ auf „Übersetzungssprachen …“ klicken und die benötigten Sprachen laden.";
+"Translate screenshot" = "Bildschirmfoto übersetzen";
+"Select an area to read and translate." = "Bereich zum Lesen und Übersetzen auswählen.";
+"Open translator" = "Übersetzer öffnen";
+"Type or paste text to translate." = "Text zum Übersetzen eingeben oder einsetzen.";
+"Launch at login" = "Bei der Anmeldung öffnen";
+"Listening…" = "Warten auf Eingabe …";
+"Click, then press the new shortcut. Esc cancels." = "Klicken und dann den neuen Kurzbefehl drücken. Esc bricht ab.";
+"Another app already uses this shortcut. Click to choose a different one." = "Dieser Kurzbefehl wird bereits von einer anderen App verwendet. Klicken, um einen anderen auszuwählen.";

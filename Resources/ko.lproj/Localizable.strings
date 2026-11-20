@@ -1,0 +1,61 @@
+/* Menu bar icon's menu, and window titles */
+"Settings…" = "설정…";
+"About picoTranslator" = "picoTranslator에 관하여";
+"Quit picoTranslator" = "picoTranslator 종료";
+"picoTranslator Settings" = "picoTranslator 설정";
+"Welcome" = "환영합니다";
+
+/* Translator: text areas, status and placeholders */
+"Enter text" = "텍스트 입력";
+"Translation" = "번역";
+"Reading text…" = "텍스트 인식 중…";
+"Translating…" = "번역 중…";
+"No text found in the selected area." = "선택한 영역에서 텍스트를 찾을 수 없습니다.";
+"Reading the text is taking too long. macOS may still be preparing text recognition, so try again in a moment." = "텍스트를 인식하는 데 시간이 너무 오래 걸립니다. macOS가 아직 텍스트 인식을 준비 중일 수 있으니 잠시 후 다시 시도하세요.";
+
+/* Translator: language menus. %@ is a language name, e.g. "English (Detected)" */
+"From" = "원본";
+"To" = "대상";
+"Detect Language" = "언어 감지";
+"%@ (Detected)" = "%@(감지됨)";
+"Automatic" = "자동";
+"%@ (Automatic)" = "%@(자동)";
+
+/* Translator: buttons and tooltips */
+"Swap Languages" = "언어 전환";
+"Copy Text" = "원문 복사";
+"Copy Translation" = "번역 복사";
+"Read Aloud" = "소리 내어 읽기";
+"Stop Speaking" = "말하기 중단";
+"Close" = "닫기";
+
+/* Translator: errors. The two %@ are language names (source, then target); reorder with %1$@ and %2$@ if needed */
+"Couldn't detect the language." = "언어를 감지할 수 없습니다.";
+"Choose a language to translate into." = "번역할 언어를 선택하세요.";
+"Translating %@ to %@ isn't supported." = "%1$@에서 %2$@(으)로의 번역은 지원되지 않습니다.";
+"%@ to %@ isn't set up on this Mac yet." = "이 Mac에 %1$@에서 %2$@(으)로의 번역이 아직 설정되지 않았습니다.";
+"Download in Language & Region › Translation Languages…" = "‘언어 및 지역’ › ‘번역 언어…’에서 다운로드";
+
+/* Welcome window and Settings. "Language & Region" and "Translation Languages…" are names in macOS System Settings: use macOS's own translations */
+"Welcome to picoTranslator" = "picoTranslator에 오신 것을 환영합니다";
+"Translate text on screen, or type it in." = "화면의 텍스트를 번역하거나 직접 입력하세요.";
+"Done" = "완료";
+"Permissions" = "권한";
+"Languages" = "언어";
+"Shortcuts" = "단축키";
+"Screen Recording" = "화면 기록";
+"Needed to read text from screenshots." = "스크린샷에서 텍스트를 읽는 데 필요합니다.";
+"Allow" = "허용";
+"Allowed" = "허용됨";
+"Open Settings…" = "설정 열기…";
+"Translation languages" = "번역 언어";
+"Open…" = "열기…";
+"In Language & Region, click Translation Languages… and download the ones you use." = "‘언어 및 지역’에서 ‘번역 언어…’를 클릭한 다음 사용하는 언어를 다운로드하세요.";
+"Translate screenshot" = "스크린샷 번역";
+"Select an area to read and translate." = "읽고 번역할 영역을 선택하세요.";
+"Open translator" = "번역기 열기";
+"Type or paste text to translate." = "번역할 텍스트를 입력하거나 붙여넣으세요.";
+"Launch at login" = "로그인 시 실행";
+"Listening…" = "단축키 입력…";
+"Click, then press the new shortcut. Esc cancels." = "클릭한 다음 새 단축키를 누르세요. 취소하려면 Esc 키를 누르세요.";
+"Another app already uses this shortcut. Click to choose a different one." = "다른 앱에서 이미 이 단축키를 사용하고 있습니다. 클릭하여 다른 단축키를 선택하세요.";

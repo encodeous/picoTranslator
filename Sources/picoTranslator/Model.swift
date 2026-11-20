@@ -103,14 +103,14 @@ enum Translator {
     /// target that's the same language as the source.
     static func run(_ text: String, from: Locale.Language?, to requested: Locale.Language?) async -> Outcome {
         let detected = from == nil ? await detect(text) : nil
-        guard let source = from ?? detected else { return Outcome(text: "Couldn't detect the language.", failed: true) }
+        guard let source = from ?? detected else { return Outcome(text: String(localized: "Couldn't detect the language."), failed: true) }
         guard let target = requested.flatMap({ same($0, source) ? nil : $0 }) ?? automaticTarget(for: source) else {
-            return Outcome(text: "Choose a language to translate into.", failed: true, source: detected)
+            return Outcome(text: String(localized: "Choose a language to translate into."), failed: true, source: detected)
         }
         func failure(_ message: String, needsSetup: Bool = false) -> Outcome {
             Outcome(text: message, failed: true, needsSetup: needsSetup, source: detected, target: target)
         }
-        let pair = "\(name(source)) to \(name(target))"
+        let (from, to) = (name(source), name(target))
         switch await LanguageAvailability().status(from: source, to: target) {
         case .installed:
             do {
@@ -122,9 +122,9 @@ enum Translator {
                 return failure(error.localizedDescription)
             }
         case .unsupported:
-            return failure("Translating \(pair) isn't supported.")
+            return failure(String(localized: "Translating \(from) to \(to) isn't supported."))
         default:
-            return failure("\(pair) isn't set up on this Mac yet.", needsSetup: true)
+            return failure(String(localized: "\(from) to \(to) isn't set up on this Mac yet."), needsSetup: true)
         }
     }
 

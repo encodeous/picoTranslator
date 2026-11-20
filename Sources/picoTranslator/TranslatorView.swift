@@ -45,7 +45,7 @@ struct TranslatorView: View {
             .frame(minHeight: detached ? 0 : areas.top, maxHeight: areas.top, alignment: .topLeading)  // see `areas`
             bar(dividerBelow: true) {
                 Picker("From", selection: languageBinding(\.source)) {
-                    Text(m.detected.map { "\(Translator.name($0)) (Detected)" } ?? "Detect Language").tag("")
+                    Text(m.detected.map { String(localized: "\(Translator.name($0)) (Detected)") } ?? String(localized: "Detect Language")).tag("")
                     Divider()
                     languageItems
                 }
@@ -61,7 +61,7 @@ struct TranslatorView: View {
                     if m.translating && m.output.isEmpty {
                         status("Translating…")
                     } else {
-                        Text(m.output.isEmpty ? "Translation" : m.output)
+                        Text(m.output.isEmpty ? String(localized: "Translation") : m.output)
                             .foregroundStyle(m.output.isEmpty || m.failed ? .secondary : .primary)
                             .textSelection(.enabled)
                     }
@@ -80,7 +80,7 @@ struct TranslatorView: View {
             .frame(minHeight: detached ? 0 : areas.bottom, maxHeight: areas.bottom)
             bar(dividerBelow: false) {
                 Picker("To", selection: languageBinding(\.target)) {
-                    Text(m.usedTarget.map { "\(Translator.name($0)) (Automatic)" } ?? "Automatic").tag("")
+                    Text(m.usedTarget.map { String(localized: "\(Translator.name($0)) (Automatic)") } ?? String(localized: "Automatic")).tag("")
                     Divider()
                     languageItems
                 }
@@ -183,7 +183,7 @@ struct TranslatorView: View {
         }
     }
 
-    private func status(_ text: String) -> some View {
+    private func status(_ text: LocalizedStringKey) -> some View {
         HStack(spacing: 8) {
             ProgressView().controlSize(.small)
             Text(text).foregroundStyle(.secondary)
@@ -193,19 +193,20 @@ struct TranslatorView: View {
 
     private func speakButton(_ id: String, _ text: String, _ language: Locale.Language?) -> some View {
         let on = speaker.speaking == id
-        return Button(on ? "Stop Speaking" : "Read Aloud", systemImage: on ? "stop.fill" : "speaker.wave.2") {
+        let title = on ? String(localized: "Stop Speaking") : String(localized: "Read Aloud")
+        return Button(title, systemImage: on ? "stop.fill" : "speaker.wave.2") {
             speaker.toggle(id, text, language)
         }
-        .help(on ? "Stop Speaking" : "Read Aloud")
+        .help(title)
         .disabled(text.isEmpty)
     }
 
-    private func copyButton(_ title: String, _ text: String) -> some View {
+    private func copyButton(_ title: LocalizedStringKey, _ text: String) -> some View {
         Button(title, systemImage: "doc.on.doc") {
             NSPasteboard.general.clearContents()
             NSPasteboard.general.setString(text, forType: .string)
         }
-        .help(title)
+        .help(Text(title))
         .disabled(text.isEmpty)
     }
 

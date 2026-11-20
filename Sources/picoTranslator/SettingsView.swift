@@ -82,8 +82,8 @@ struct WelcomeView: View {
 
 /// A System Settings style row label: a coloured icon tile, a title and an optional caption.
 struct RowLabel: View {
-    let title: String, caption: String?, symbol: String, color: Color
-    init(_ title: String, _ caption: String?, symbol: String, color: Color) {
+    let title: LocalizedStringKey, caption: LocalizedStringKey?, symbol: String, color: Color
+    init(_ title: LocalizedStringKey, _ caption: LocalizedStringKey?, symbol: String, color: Color) {
         (self.title, self.caption, self.symbol, self.color) = (title, caption, symbol, color)
     }
 
@@ -112,7 +112,7 @@ struct ScreenRecordingRow: View {
             if granted {
                 Label("Allowed", systemImage: "checkmark.circle.fill").foregroundStyle(.green).fontWeight(.medium)
             } else {
-                Button(asked ? "Open Settings…" : "Allow") {
+                Button(asked ? String(localized: "Open Settings…") : String(localized: "Allow")) {
                     if asked {  // still off after asking (switched off before): open the list to switch it on
                         NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture")!)
                     } else {  // prompts if macOS has no record of the app, and puts it back in the list either way
@@ -156,8 +156,8 @@ struct KeyRecorder: View {
                 .foregroundStyle(taken ? .red : .primary)
             }
         }
-        .help(taken ? "Another app already uses this shortcut. Click to choose a different one."
-                    : "Click, then press the new shortcut. Esc cancels.")
+        .help(taken ? String(localized: "Another app already uses this shortcut. Click to choose a different one.")
+                    : String(localized: "Click, then press the new shortcut. Esc cancels."))
     }
 
     /// One cap per modifier symbol, then one for the key (which may be a word like "Space" or "F5").

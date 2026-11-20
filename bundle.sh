@@ -10,7 +10,8 @@
 #       saved once with: xcrun notarytool store-credentials picoTranslator
 #
 # Optional: BUILD=<build number> (default: a timestamp; App Store Connect needs it to increase every upload),
-# APP_ID / INSTALLER_ID (signing identities), NOTARY_PROFILE (default "picoTranslator").
+# APP_ID / INSTALLER_ID (signing identities), NOTARY_PROFILE (default "picoTranslator"),
+# NOTARIZE=0 (release: skip notarizing, to check the disk image quickly).
 set -e
 cd "$(dirname "$0")"
 MODE=$1
@@ -32,6 +33,7 @@ if [ "$MODE" = appstore ]; then
     PROFILE=${PROFILE:-$(ls signing/*.provisionprofile 2>/dev/null | head -1)}
     [ -f "$PROFILE" ] || { echo "Put the app's Mac App Store provisioning profile in signing/, or set PROFILE." >&2; exit 1; }
     cp "$PROFILE" "$APP/Contents/embedded.provisionprofile"
+    xattr -cr "$APP"  # a downloaded profile carries com.apple.quarantine, which the App Store rejects
     # The App Store also needs the app and team identifiers, taken from the profile.
     TEAM=$(security cms -D -i "$PROFILE" | plutil -extract TeamIdentifier.0 raw -o - -)
     BUNDLE_ID=$(plutil -extract CFBundleIdentifier raw Info.plist)
@@ -47,12 +49,45 @@ if [ "$MODE" = appstore ]; then
 else
     ID=${APP_ID:-Developer ID Application}
     codesign --force --options runtime --timestamp --entitlements picoTranslator.entitlements -s "$ID" "$APP"
-    # A disk image with the app and an Applications shortcut to drag it onto.
-    mkdir dist/dmg && mv "$APP" dist/dmg/ && ln -s /Applications dist/dmg/Applications
-    rm -f dist/picoTranslator.dmg
-    hdiutil create -volname picoTranslator -srcfolder dist/dmg -format UDZO -quiet dist/picoTranslator.dmg
+    # A disk image with the app and an Applications shortcut to drag it onto, over a background with an
+    # arrow (assets/dmg). Finder saves the window layout into the image, so it's arranged by scripting
+    # Finder on a writable copy, which is then compressed.
+    mkdir -p dist/dmg/.background && mv "$APP" dist/dmg/ && ln -s /Applications dist/dmg/Applications
+    cp assets/dmg/background.tiff dist/dmg/.background/
+    rm -f dist/picoTranslator.dmg dist/rw.dmg
+    hdiutil create -volname picoTranslator -srcfolder dist/dmg -format UDRW -fs HFS+ -quiet dist/rw.dmg
     rm -rf dist/dmg
+    ATTACHED=$(hdiutil attach dist/rw.dmg -readwrite -noverify -noautoopen | grep Apple_HFS)
+    DEVICE=$(echo "$ATTACHED" | awk '{print $1}')
+    VOLUME=$(basename "$(echo "$ATTACHED" | sed 's/.*Apple_HFS[[:space:]]*//')")  # "picoTranslator 1" if one is open already
+    osascript - "$VOLUME" <<'EOF'
+on run argv
+    tell application "Finder" to tell disk (item 1 of argv)
+        open
+        set current view of container window to icon view
+        set toolbar visible of container window to false
+        set statusbar visible of container window to false
+        set pathbar visible of container window to false
+        set bounds of container window to {200, 120, 840, 548} -- 640 x 400, plus the title bar
+        set opts to icon view options of container window
+        set arrangement of opts to not arranged
+        set icon size of opts to 112
+        set text size of opts to 13
+        set background picture of opts to file ".background:background.tiff"
+        set position of item "picoTranslator.app" to {170, 190}
+        set position of item "Applications" to {470, 190}
+        update without registering applications
+        delay 1
+        close
+    end tell
+end run
+EOF
+    sync
+    hdiutil detach "$DEVICE" -quiet
+    hdiutil convert dist/rw.dmg -format UDZO -quiet -o dist/picoTranslator.dmg
+    rm dist/rw.dmg
     codesign --timestamp -s "$ID" dist/picoTranslator.dmg
+    [ "$NOTARIZE" = 0 ] && { echo "Built dist/picoTranslator.dmg (build $BUILD), not notarized (NOTARIZE=0)."; exit 0; }
     xcrun notarytool submit dist/picoTranslator.dmg --keychain-profile "${NOTARY_PROFILE:-picoTranslator}" --wait
     xcrun stapler staple dist/picoTranslator.dmg  # so it opens without a warning, even offline
     echo "Built dist/picoTranslator.dmg (build $BUILD), notarized."

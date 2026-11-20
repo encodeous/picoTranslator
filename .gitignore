@@ -1,0 +1,8 @@
+.DS_Store
+.build/
+build/
+# Icon render sources (Blender scene, font, art): private repo only
+assets/icon/render/
+dist/
+# Signing files (e.g. the App Store provisioning profile): kept local
+signing/

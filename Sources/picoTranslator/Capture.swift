@@ -208,7 +208,8 @@ enum TextReader {
         let args = CommandLine.arguments
         if args.count == 3, args[1] == readFlag {
             let url = URL(fileURLWithPath: args[2])
-            let text = recognize(VNImageRequestHandler(url: url))
+            let image = CGImageSourceCreateWithURL(url as CFURL, nil).flatMap { CGImageSourceCreateImageAtIndex($0, 0, nil) }
+            let text = image.map { recognize(VNImageRequestHandler(cgImage: enlarged($0))) } ?? ""
             try? FileManager.default.removeItem(at: url)
             FileHandle.standardOutput.write(Data(text.utf8))
             return true
@@ -229,6 +230,20 @@ enum TextReader {
         request.recognitionLanguages = ["zh-Hans", "zh-Hant", "ja-JP", "ko-KR", "en-US"]
         try? handler.perform([request])
         return (request.results ?? []).compactMap { $0.topCandidates(1).first?.string }.joined(separator: "\n")
+    }
+
+    /// Vision misreads small areas more often: in tests on a sticky note, it dropped characters like 的
+    /// in about a quarter of selections, or lost the Chinese entirely. Doubling a small image first
+    /// fixed most of those. Large areas are left as they are, to keep memory down.
+    private static func enlarged(_ image: CGImage) -> CGImage {
+        let (w, h) = (image.width * 2, image.height * 2)
+        guard w * h <= 4096 * 4096,
+              let ctx = CGContext(data: nil, width: w, height: h, bitsPerComponent: 8, bytesPerRow: 0,
+                                  space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue)
+        else { return image }
+        ctx.interpolationQuality = .high
+        ctx.draw(image, in: CGRect(x: 0, y: 0, width: w, height: h))
+        return ctx.makeImage() ?? image
     }
 
     /// A small image with some English, Chinese and French text, for the warm-up.

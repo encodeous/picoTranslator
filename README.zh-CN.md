@@ -12,6 +12,12 @@
   <img src="assets/screenshots/demo-zh.gif" width="560" alt="框选便签上的一行中文，picoTranslator 在便签正下方显示英文译文">
 </p>
 
+## 安装
+
+从[最新版本](https://github.com/encodeous/picoTranslator/releases/latest)下载 `picoTranslator.dmg`，打开后将 picoTranslator 拖到“应用程序”文件夹。App Store 版本即将推出。
+
+需要 macOS 26 或更高版本。
+
 ## picoTranslator 真的非常轻
 
 - 应用本身比它的图标还小！
@@ -28,12 +34,6 @@
 <p align="center">
   <img src="assets/screenshots/settings-zh.png" width="420" alt="picoTranslator 设置：屏幕录制权限、翻译语言、快捷键和登录时启动">
 </p>
-
-## 安装
-
-Homebrew、App Store 和 GitHub Releases 即将推出。在此之前，请从源代码构建。
-
-需要 macOS 26 或更高版本。
 
 ## 开始使用
 

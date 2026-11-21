@@ -12,6 +12,12 @@
   <img src="assets/screenshots/demo.gif" width="560" alt="Selecting a line of English on a sticky note, and picoTranslator showing its Chinese translation right below the note">
 </p>
 
+## Install
+
+Download `picoTranslator.dmg` from the [latest release](https://github.com/encodeous/picoTranslator/releases/latest), open it and drag picoTranslator into Applications. The App Store version is coming soon.
+
+Requires macOS 26 or later.
+
 ## picoTranslator is really, really lightweight
 
 - The app is smaller than its own icon!
@@ -28,12 +34,6 @@
 <p align="center">
   <img src="assets/screenshots/settings.png" width="420" alt="picoTranslator settings: Screen Recording permission, translation languages, shortcuts and launch at login">
 </p>
-
-## Install
-
-Homebrew, the App Store and GitHub Releases are coming soon. Until then, build it from source.
-
-Requires macOS 26 or later.
 
 ## Getting started
 

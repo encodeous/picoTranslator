@@ -9,7 +9,11 @@
 #       Releases and Homebrew. Needs: a "Developer ID Application" certificate, and notary credentials
 #       saved once with: xcrun notarytool store-credentials picoTranslator
 #
-# Optional: BUILD=<build number> (default: a timestamp; App Store Connect needs it to increase every upload),
+# The version is the git tag on the commit being packaged (v1.2.0 or 1.2.0), so tag the release first:
+#   git tag v1.2.0
+#
+# Optional: VERSION=<x.y.z> (instead of the tag),
+# BUILD=<build number> (default: a timestamp; App Store Connect needs it to increase every upload),
 # APP_ID / INSTALLER_ID (signing identities), NOTARY_PROFILE (default "picoTranslator"),
 # NOTARIZE=0 (release: skip notarizing, to check the disk image quickly).
 set -e
@@ -17,6 +21,10 @@ cd "$(dirname "$0")"
 MODE=$1
 case "$MODE" in appstore | release) ;; *) echo "usage: ./bundle.sh appstore|release" >&2; exit 1 ;; esac
 
+VERSION=${VERSION:-$(git describe --tags --exact-match --match 'v[0-9]*' --match '[0-9]*' 2>/dev/null || true)}
+VERSION=${VERSION#v}
+echo "$VERSION" | grep -qE '^[0-9]+(\.[0-9]+){0,2}$' ||
+    { echo "Tag this commit with its version first (git tag v1.2.0), or set VERSION=1.2.0." >&2; exit 1; }
 BUILD=${BUILD:-$(date +%Y%m%d%H%M)}
 APP=dist/picoTranslator.app
 
@@ -26,6 +34,7 @@ rm -rf "$APP" dist/dmg "dist/picoTranslator-$BUILD.dSYM" && mkdir -p "$APP/Conte
 cp "$(swift build $FLAGS --show-bin-path)/picoTranslator" "$APP/Contents/MacOS/"
 cp Info.plist "$APP/Contents/"
 cp -R Resources/. "$APP/Contents/Resources/"  # icon and translations (*.lproj)
+plutil -replace CFBundleShortVersionString -string "$VERSION" "$APP/Contents/Info.plist"
 plutil -replace CFBundleVersion -string "$BUILD" "$APP/Contents/Info.plist"
 # The toolchain keys Xcode writes into every app it builds, which App Store Connect checks.
 XCODE_VERSION=$(xcodebuild -version | awk '/^Xcode/ {print $2}')
@@ -60,7 +69,7 @@ if [ "$MODE" = appstore ]; then
     [ -n "$INSTALLER_ID" ] || { echo "No Mac Installer Distribution certificate in the keychain. Set INSTALLER_ID to choose one." >&2; exit 1; }
     rm -f dist/picoTranslator.pkg
     productbuild --component "$APP" /Applications --sign "$INSTALLER_ID" dist/picoTranslator.pkg
-    echo "Built dist/picoTranslator.pkg (build $BUILD). Upload it to App Store Connect with Transporter."
+    echo "Built dist/picoTranslator.pkg ($VERSION, build $BUILD). Upload it to App Store Connect with Transporter."
 else
     ID=${APP_ID:-Developer ID Application}
     codesign --force --options runtime --timestamp --entitlements picoTranslator.entitlements -s "$ID" "$APP"
@@ -104,8 +113,8 @@ EOF
     hdiutil convert dist/rw.dmg -format UDZO -quiet -o dist/picoTranslator.dmg
     rm dist/rw.dmg
     codesign --timestamp -s "$ID" dist/picoTranslator.dmg
-    [ "$NOTARIZE" = 0 ] && { echo "Built dist/picoTranslator.dmg (build $BUILD), not notarized (NOTARIZE=0)."; exit 0; }
+    [ "$NOTARIZE" = 0 ] && { echo "Built dist/picoTranslator.dmg ($VERSION, build $BUILD), not notarized (NOTARIZE=0)."; exit 0; }
     xcrun notarytool submit dist/picoTranslator.dmg --keychain-profile "${NOTARY_PROFILE:-picoTranslator}" --wait
     xcrun stapler staple dist/picoTranslator.dmg  # so it opens without a warning, even offline
-    echo "Built dist/picoTranslator.dmg (build $BUILD), notarized."
+    echo "Built dist/picoTranslator.dmg ($VERSION, build $BUILD), notarized."
 fi

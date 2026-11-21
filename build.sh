@@ -11,6 +11,9 @@ APP=build/picoTranslator.app
 rm -rf "$APP" && mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp .build/release/picoTranslator "$APP/Contents/MacOS/"
 cp Info.plist "$APP/Contents/"
+# The version from the latest git tag (v1.2.0 or 1.2.0), if there is one.
+TAG=$(git describe --tags --abbrev=0 --match 'v[0-9]*' --match '[0-9]*' 2>/dev/null) &&
+    plutil -replace CFBundleShortVersionString -string "${TAG#v}" "$APP/Contents/Info.plist"
 cp -R Resources/. "$APP/Contents/Resources/"  # icon and translations (*.lproj)
 strip -x "$APP/Contents/MacOS/picoTranslator"
 

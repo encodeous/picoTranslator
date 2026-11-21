@@ -8,12 +8,24 @@ import Vision
 /// as the area is selected.
 @MainActor enum Capture {
     private static let prefix = "picotranslator-"
+    private static var warmUp: Process?
 
-    enum Reading { case text(String), noText, timedOut }
+    /// `area` is the selected area in screen points (AppKit coordinates).
+    enum Shot { case image(URL, area: CGRect), cancelled, failed }
+    /// `bounds` is where the text is in the image, as fractions of its size from the bottom left (as
+    /// Vision has it): see `rect(of:in:)`.
+    enum Reading { case text(String, bounds: CGRect?), noText, timedOut, failed }
 
-    /// Lets the user select an area and saves it as an image. Returns nil if they cancelled.
-    static func screenshot() async -> URL? {
-        guard let area = await AreaPicker.pick() else { return nil }
+    /// The box around the text on screen, from its `bounds` in the image of `area`. A little bigger
+    /// than Vision's, which hugs the letters, so the popover's arrow doesn't touch them.
+    nonisolated static func rect(of bounds: CGRect, in area: CGRect) -> CGRect {
+        CGRect(x: area.minX + bounds.minX * area.width, y: area.minY + bounds.minY * area.height,
+               width: bounds.width * area.width, height: bounds.height * area.height).insetBy(dx: -2, dy: -4)
+    }
+
+    /// Lets the user select an area and saves it as an image.
+    static func screenshot() async -> Shot {
+        guard let area = await AreaPicker.pick() else { return .cancelled }
         try? await Task.sleep(for: .milliseconds(50))  // let the overlay leave the screen
         // ScreenCaptureKit uses display space: points down from the top-left of the main display.
         let main = NSScreen.screens[0].frame
@@ -23,36 +35,65 @@ import Vision
         }
         let url = FileManager.default.temporaryDirectory.appendingPathComponent(prefix + UUID().uuidString + ".png")
         guard let image, let file = CGImageDestinationCreateWithURL(url as CFURL, UTType.png.identifier as CFString, 1, nil)
-        else { return nil }
+        else { return .failed }
         CGImageDestinationAddImage(file, image, nil)
-        return CGImageDestinationFinalize(file) ? url : nil
+        return CGImageDestinationFinalize(file) ? .image(url, area: area) : .failed
     }
 
-    /// Reads the text in the image with `TextReader`, which also deletes the image. Stops waiting after
-    /// 10 s but lets the helper go on for a while: if macOS was still compiling its text model, the
-    /// finished compile is then saved for the next screenshot.
+    /// Reads the text in the image with `TextReader`, then deletes the image.
+    ///
+    /// With nothing cached (a fresh install, a macOS update), macOS first spends about 30 s compiling
+    /// its text model, and longer for a script it hasn't compiled yet, such as Arabic. A second helper
+    /// would compile it again on its own, making both slower, so this waits for the launch warm-up
+    /// first. The caller says what's going on after 3 s.
     static func text(in url: URL) async -> Reading {
+        let start = Date.now
+        while warmUp?.isRunning == true, Date.now.timeIntervalSince(start) < 60 {
+            try? await Task.sleep(for: .milliseconds(100))
+        }
+        warmUp = nil
+        let deadline = start.addingTimeInterval(90)
+        var reading = await read(url, until: deadline)
+        // Vision's model can fail to load for the rest of a process (E5RT error 13): a fresh helper usually works.
+        if case .failed = reading, deadline.timeIntervalSinceNow > 5 { reading = await read(url, until: deadline) }
+        if case .timedOut = reading {} else { try? FileManager.default.removeItem(at: url) }
+        return reading
+    }
+
+    /// macOS keeps its compiled text model as a cache, and doesn't save caches when the disk is nearly
+    /// full, so it compiles the model again for every screenshot. This is the space macOS allows for
+    /// such files: 0 on a disk with 3.8 GB free, when the model wasn't being saved. Apple publishes no
+    /// cutoff, hence a generous 1 GB.
+    nonisolated static var lowOnStorage: Bool {
+        let values = try? URL.homeDirectory.resourceValues(forKeys: [.volumeAvailableCapacityForOpportunisticUsageKey])
+        return values?.volumeAvailableCapacityForOpportunisticUsage.map { $0 < 1_000_000_000 } ?? false
+    }
+
+    /// One helper run. A helper still going at the deadline is given another minute, so a compile in
+    /// progress is saved for the next screenshot, then stopped, and the image deleted.
+    private static func read(_ url: URL, until deadline: Date) async -> Reading {
         let p = process([TextReader.readFlag, url.path])
         let out = Pipe()
         p.standardOutput = out
-        guard (try? p.run()) != nil else {
-            try? FileManager.default.removeItem(at: url)
-            return .noText
-        }
-        let output = out.fileHandleForReading
+        guard (try? p.run()) != nil else { return .failed }
+        let output = out.fileHandleForReading, helper = Unchecked(p)
         let reading = await withCheckedContinuation { (c: CheckedContinuation<Reading, Never>) in
             let once = Once(c)
             // Read while the helper runs: a full pipe would otherwise block it from exiting.
             DispatchQueue.global(qos: .userInitiated).async {
-                let text = String(decoding: output.readDataToEndOfFile(), as: UTF8.self)
-                once.resume(text.isEmpty ? .noText : .text(text))
+                let data = output.readDataToEndOfFile()
+                helper.value.waitUntilExit()
+                guard helper.value.terminationStatus == 0 else { return once.resume(.failed) }  // crashed, or Vision failed
+                guard let result = try? JSONDecoder().decode(TextReader.Result.self, from: data) else { return once.resume(.failed) }
+                once.resume(result.text.isEmpty ? .noText : .text(result.text, bounds: result.bounds))
             }
-            DispatchQueue.global().asyncAfter(deadline: .now() + 10) { once.resume(.timedOut) }
+            DispatchQueue.global().asyncAfter(deadline: .now() + max(deadline.timeIntervalSinceNow, 1)) { once.resume(.timedOut) }
         }
         if case .timedOut = reading {
-            Task {  // give a stuck helper up to two minutes to finish compiling, then stop it
-                try? await Task.sleep(for: .seconds(120))
-                if p.isRunning { p.terminate() }
+            Task {
+                try? await Task.sleep(for: .seconds(60))
+                if p.isRunning { p.terminate(); try? await Task.sleep(for: .seconds(1)) }
+                try? FileManager.default.removeItem(at: url)
             }
         }
         return reading
@@ -65,7 +106,13 @@ import Vision
         for f in (try? FileManager.default.contentsOfDirectory(atPath: tmp.path)) ?? [] where f.hasPrefix(prefix) {
             try? FileManager.default.removeItem(at: tmp.appendingPathComponent(f))
         }
-        try? process([TextReader.warmUpFlag]).run()
+        let p = process([TextReader.warmUpFlag])
+        if (try? p.run()) != nil { warmUp = p }
+    }
+
+    private final class Unchecked<T>: @unchecked Sendable {
+        let value: T
+        init(_ value: T) { self.value = value }
     }
 
     /// This app's own binary, started as the text-reading helper.
@@ -96,9 +143,13 @@ import Vision
 @MainActor final class AreaPicker {
     private var windows: [NSWindow] = []
     private var continuation: CheckedContinuation<CGRect?, Never>?
+    /// The overlay is up. The capture shortcut is ignored meanwhile, or a second overlay would stack on top.
+    private(set) static var isActive = false
 
     /// The selected area in screen points (AppKit coordinates), or nil if cancelled.
     static func pick() async -> CGRect? {
+        isActive = true
+        defer { isActive = false }
         let picker = AreaPicker()
         return await withCheckedContinuation { picker.begin($0) }
     }
@@ -208,28 +259,44 @@ enum TextReader {
         let args = CommandLine.arguments
         if args.count == 3, args[1] == readFlag {
             let url = URL(fileURLWithPath: args[2])
-            let image = CGImageSourceCreateWithURL(url as CFURL, nil).flatMap { CGImageSourceCreateImageAtIndex($0, 0, nil) }
-            let text = image.map { recognize(VNImageRequestHandler(cgImage: enlarged($0))) } ?? ""
+            // On failure, exit with an error and keep the image, so the app can try again with a fresh helper.
+            guard let image = CGImageSourceCreateWithURL(url as CFURL, nil).flatMap({ CGImageSourceCreateImageAtIndex($0, 0, nil) }),
+                  let result = recognize(enlarged(image)), let json = try? JSONEncoder().encode(result) else { exit(1) }
             try? FileManager.default.removeItem(at: url)
-            FileHandle.standardOutput.write(Data(text.utf8))
+            FileHandle.standardOutput.write(json)
             return true
         }
         if args.count == 2, args[1] == warmUpFlag {
-            if let image = sampleImage() { _ = recognize(VNImageRequestHandler(cgImage: image)) }
+            if let image = sampleImage() { _ = recognize(image) }
             return true
         }
         return false
     }
 
-    private static func recognize(_ handler: VNImageRequestHandler) -> String {
+    /// What the helper reports to the app.
+    struct Result: Codable {
+        var text: String
+        var bounds: CGRect?  // all the text together, in Vision's normalized coordinates
+    }
+
+    /// The text as paragraphs (see `Paragraphs`), and where it is, or nil if Vision failed.
+    static func recognize(_ image: CGImage) -> Result? {
         let request = VNRecognizeTextRequest()
         request.recognitionLevel = .accurate
         request.automaticallyDetectsLanguage = true
         // Detection judges a line by how it starts, so "picoTranslator真的非常轻" read as English and the
-        // Chinese was lost. Listing Chinese, Japanese and Korean first fixes that, and Latin text still reads the same.
+        // Chinese was lost. Listing Chinese, Japanese and Korean first fixes that when they're most of
+        // the line, and Latin text still reads the same.
         request.recognitionLanguages = ["zh-Hans", "zh-Hant", "ja-JP", "ko-KR", "en-US"]
-        try? handler.perform([request])
-        return (request.results ?? []).compactMap { $0.topCandidates(1).first?.string }.joined(separator: "\n")
+        do { try VNImageRequestHandler(cgImage: image).perform([request]) } catch {
+            FileHandle.standardError.write(Data("Text recognition failed: \(error)\n".utf8))
+            return nil
+        }
+        let (w, h) = (image.width, image.height)
+        let found = (request.results ?? []).compactMap { o in o.topCandidates(1).first.map { (o.boundingBox, $0.string) } }
+        let text = Paragraphs.join(found.map { Paragraphs.Line(text: $0.1, box: VNImageRectForNormalizedRect($0.0, w, h)) })
+        let bounds = found.map(\.0).reduce(nil as CGRect?) { $0?.union($1) ?? $1 }
+        return Result(text: text, bounds: bounds)
     }
 
     /// Vision misreads small areas more often: in tests on a sticky note, it dropped characters like 的

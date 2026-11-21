@@ -59,3 +59,17 @@
 "Listening…" = "請按快速鍵…";
 "Click, then press the new shortcut. Esc cancels." = "按一下，然後按下新的快速鍵。按 Esc 鍵取消。";
 "Another app already uses this shortcut. Click to choose a different one." = "另一個 App 已在使用此快速鍵。按一下以選擇其他快速鍵。";
+
+/* Added with the first-translation and detection fixes. In "This text looks like %@, not %@." the first %@ is the language the text seems to be in, the second the chosen one; reorder with %1$@ and %2$@ */
+"Preparing text recognition…" = "正在準備文字辨識…";
+"macOS is getting its text model ready. This happens once, and can take up to a minute." = "macOS 正在準備文字辨識模型。只需準備一次，最多可能需要一分鐘。";
+"Couldn't read the text. Try again." = "無法辨識文字，請再試一次。";
+"Couldn't take the screenshot. Try again." = "無法擷取螢幕，請再試一次。";
+"Translating %@ isn't supported." = "不支援翻譯%@。";
+"Couldn't translate the text. Try again." = "無法翻譯這段文字，請再試一次。";
+"This text looks like %@, not %@." = "這段文字看起來是%1$@，而不是%2$@。";
+"Space" = "空白鍵";
+
+/* Shown instead of the note above when the disk is too full for macOS to keep its text model */
+"Your Mac is low on storage, so macOS can't keep its text model and prepares it again each time. Free up some space to make this faster." = "Mac 的儲存空間不足，macOS 無法保留文字辨識模型，每次都要重新準備。釋放一些空間即可加快速度。";
+"Manage Storage…" = "管理儲存空間…";

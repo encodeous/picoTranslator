@@ -25,6 +25,15 @@ extension Shortcut {
         self.init(key: UInt32(e.keyCode), mods: UInt32(held.reduce(0) { $0 | $1.1 }), label: held.map(\.2).joined() + key)
     }
 
+    /// ⌘ on its own, or with ⇧, is how every app's menu shortcuts work (⌘W, ⌘C, ⌘⇧S…), so taking one
+    /// globally would break it in every app. Pressing ⌘W to close Settings while recording would do that.
+    var clashesWithMenus: Bool {
+        let functionKeys = [kVK_F1, kVK_F2, kVK_F3, kVK_F4, kVK_F5, kVK_F6, kVK_F7, kVK_F8, kVK_F9, kVK_F10, kVK_F11, kVK_F12]
+        return mods & ~UInt32(shiftKey) == UInt32(cmdKey) && !functionKeys.contains(Int(key))
+    }
+
+    func sameKeys(as other: Shortcut) -> Bool { key == other.key && mods == other.mods }
+
     /// The key's own name, with no modifiers applied, so ⌘⇧2 reads "2", not "@".
     private static func keyName(_ e: NSEvent) -> String {
         let named: [Int: String] = [

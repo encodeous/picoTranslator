@@ -59,3 +59,17 @@
 "Listening…" = "단축키 입력…";
 "Click, then press the new shortcut. Esc cancels." = "클릭한 다음 새 단축키를 누르세요. 취소하려면 Esc 키를 누르세요.";
 "Another app already uses this shortcut. Click to choose a different one." = "다른 앱에서 이미 이 단축키를 사용하고 있습니다. 클릭하여 다른 단축키를 선택하세요.";
+
+/* Added with the first-translation and detection fixes. In "This text looks like %@, not %@." the first %@ is the language the text seems to be in, the second the chosen one; reorder with %1$@ and %2$@ */
+"Preparing text recognition…" = "텍스트 인식 준비 중…";
+"macOS is getting its text model ready. This happens once, and can take up to a minute." = "macOS가 텍스트 인식 모델을 준비하고 있습니다. 한 번만 준비하며, 최대 1분 정도 걸릴 수 있습니다.";
+"Couldn't read the text. Try again." = "텍스트를 읽을 수 없습니다. 다시 시도하세요.";
+"Couldn't take the screenshot. Try again." = "스크린샷을 찍을 수 없습니다. 다시 시도하세요.";
+"Translating %@ isn't supported." = "%@ 번역은 지원되지 않습니다.";
+"Couldn't translate the text. Try again." = "텍스트를 번역할 수 없습니다. 다시 시도하세요.";
+"This text looks like %@, not %@." = "이 텍스트는 %2$@이(가) 아니라 %1$@인 것 같습니다.";
+"Space" = "스페이스";
+
+/* Shown instead of the note above when the disk is too full for macOS to keep its text model */
+"Your Mac is low on storage, so macOS can't keep its text model and prepares it again each time. Free up some space to make this faster." = "Mac의 저장 공간이 부족하여 macOS가 텍스트 인식 모델을 보관하지 못하고 매번 다시 준비합니다. 저장 공간을 확보하면 더 빨라집니다.";
+"Manage Storage…" = "저장 공간 관리…";

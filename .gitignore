@@ -9,3 +9,10 @@ publish.sh
 dist/
 # Signing files (e.g. the App Store provisioning profile): kept local
 signing/
+# Signing and upload credentials, wherever they end up (bundle.sh accepts PROFILE=<any path>)
+*.p8
+*.p12
+*.cer
+*.provisionprofile
+# Made by Xcode when it opens Package.swift
+.swiftpm/

@@ -59,3 +59,17 @@
 "Listening…" = "En attente…";
 "Click, then press the new shortcut. Esc cancels." = "Cliquez, puis appuyez sur le nouveau raccourci. Échap pour annuler.";
 "Another app already uses this shortcut. Click to choose a different one." = "Une autre app utilise déjà ce raccourci. Cliquez pour en choisir un autre.";
+
+/* Added with the first-translation and detection fixes. In "This text looks like %@, not %@." the first %@ is the language the text seems to be in, the second the chosen one; reorder with %1$@ and %2$@ */
+"Preparing text recognition…" = "Préparation de la reconnaissance du texte…";
+"macOS is getting its text model ready. This happens once, and can take up to a minute." = "macOS prépare son modèle de reconnaissance du texte. Cela n’arrive qu’une fois et peut prendre jusqu’à une minute.";
+"Couldn't read the text. Try again." = "Impossible de lire le texte. Réessayez.";
+"Couldn't take the screenshot. Try again." = "Impossible de faire la capture d’écran. Réessayez.";
+"Translating %@ isn't supported." = "La traduction depuis la langue « %@ » n’est pas prise en charge.";
+"Couldn't translate the text. Try again." = "Impossible de traduire le texte. Réessayez.";
+"This text looks like %@, not %@." = "Ce texte semble être en %1$@, et non en %2$@.";
+"Space" = "Espace";
+
+/* Shown instead of the note above when the disk is too full for macOS to keep its text model */
+"Your Mac is low on storage, so macOS can't keep its text model and prepares it again each time. Free up some space to make this faster." = "Votre Mac manque d’espace de stockage : macOS ne peut pas conserver son modèle de reconnaissance du texte et le prépare à nouveau à chaque fois. Libérez de l’espace pour accélérer la lecture.";
+"Manage Storage…" = "Gérer le stockage…";

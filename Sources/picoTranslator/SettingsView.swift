@@ -5,7 +5,10 @@ import SwiftUI
 /// The setup sections, used by both the welcome window and Settings. Styled like System Settings.
 struct SetupForm: View {
     let m: Model
-    @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
+    @State private var launchAtLogin = Self.loginItemOn
+
+    /// On, or waiting for the user's approval in System Settings › Login Items.
+    private static var loginItemOn: Bool { [.enabled, .requiresApproval].contains(SMAppService.mainApp.status) }
 
     var body: some View {
         Form {
@@ -33,7 +36,14 @@ struct SetupForm: View {
                 }
             }
             Section {
-                Toggle(isOn: $launchAtLogin) {
+                // Set from the toggle only: writing `launchAtLogin` back from an onChange would fire it
+                // again, which unregistered the app right after sending the user to approve it.
+                Toggle(isOn: Binding(get: { launchAtLogin }, set: { on in
+                    let service = SMAppService.mainApp
+                    try? on ? service.register() : service.unregister()
+                    if on, service.status == .requiresApproval { SMAppService.openSystemSettingsLoginItems() }
+                    launchAtLogin = Self.loginItemOn  // show what actually happened
+                })) {
                     RowLabel("Launch at login", nil, symbol: "power", color: .gray)
                 }
             }
@@ -42,11 +52,8 @@ struct SetupForm: View {
         .scrollDisabled(true)
         .frame(width: 460, height: 470)
         .onDisappear { m.stopRecording() }
-        .onChange(of: launchAtLogin) { _, on in
-            let service = SMAppService.mainApp
-            try? on ? service.register() : service.unregister()
-            if service.status == .requiresApproval { SMAppService.openSystemSettingsLoginItems() }
-            launchAtLogin = service.status == .enabled  // show what actually happened
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            launchAtLogin = Self.loginItemOn  // e.g. back from approving it in System Settings
         }
     }
 }
@@ -164,7 +171,8 @@ struct KeyRecorder: View {
     private var keycaps: [String] {
         let label = m.shortcuts[index].label
         let mods = label.prefix { "⌃⌥⇧⌘".contains($0) }
-        return mods.map(String.init) + [String(label.dropFirst(mods.count))]
+        let key = String(label.dropFirst(mods.count))
+        return mods.map(String.init) + [key == "Space" ? String(localized: "Space") : key]
     }
 }
 
@@ -180,9 +188,12 @@ extension Model {
                 guard let self else { return }
                 if e.keyCode == kVK_Escape {
                     self.stopRecording()
-                } else if let s = Shortcut(e) {
+                } else if let s = Shortcut(e), !s.clashesWithMenus,
+                          !self.shortcuts.indices.contains(where: { $0 != index && self.shortcuts[$0].sameKeys(as: s) }) {
                     self.shortcuts[index] = s
                     self.stopRecording()
+                } else {
+                    NSSound.beep()  // no ⌃ or ⌥, an app menu shortcut like ⌘W, or the other shortcut: keep listening
                 }
             }
             return nil

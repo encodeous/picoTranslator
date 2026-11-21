@@ -9,7 +9,7 @@
 <p align="center">English · <a href="README.zh-CN.md">简体中文</a></p>
 
 <p align="center">
-  <img src="assets/screenshots/translator.png" width="560" alt="picoTranslator translating a line of English from a sticky note into Chinese">
+  <img src="assets/screenshots/demo.gif" width="560" alt="Selecting a line of English on a sticky note, and picoTranslator showing its Chinese translation next to the cursor">
 </p>
 
 ## picoTranslator is really, really lightweight
@@ -32,6 +32,16 @@
 Homebrew, the App Store and GitHub Releases are coming soon. Until then, build it from source.
 
 Requires macOS 26 or later.
+
+## Getting started
+
+picoTranslator lives in the menu bar. The first time it opens, it walks you through:
+
+1. **Screen Recording:** needed to read text from the area you select. macOS asks you to quit and reopen the app after you allow it.
+2. **Translation languages:** translations run on your Mac with Apple's models, so download the languages you use in System Settings › General › Language & Region › Translation Languages….
+3. **Shortcuts:** press ⌃⌥S to select an area of the screen and translate it, or ⌃⌥T to open the translator and type. You can change both in Settings. Press Esc to close the translator.
+
+The very first screenshot after installing (or after a macOS update) can take up to a minute, while macOS prepares its text recognition model. After that it takes a moment.
 
 ## Limitations and alternatives
 

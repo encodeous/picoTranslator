@@ -18,52 +18,74 @@ struct TranslatorView: View {
 
     private var detached: Bool { close != nil }
 
+    /// `height`: in the window, the height it opens at. With it, and the bars' height measured in the
+    /// popover, the window's first frame lays out like the popover did. Starting from 0 instead, the
+    /// text areas were squeezed for a frame and then jumped to size, a jerk as the popover turned into it.
+    init(m: Model, height: CGFloat = 0, close: (() -> Void)? = nil) {
+        _m = Bindable(m)
+        self.close = close
+        _windowHeight = State(initialValue: height)
+        _barsHeight = State(initialValue: m.barsHeight)
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             ZStack(alignment: .topLeading) {
                 if m.reading {
-                    status("Reading text…")
+                    if m.slowReading {
+                        // The popover grows to fit the note, but a window keeps its size: scroll there
+                        // rather than run over the bar below.
+                        ScrollView { slowReadingNote }
+                            .scrollIndicators(.never)
+                            .scrollBounceBehavior(.basedOnSize)
+                    } else {
+                        status("Reading text…")
+                    }
                 } else {
                     TextEditor(text: $m.input, selection: $selection)
                         .textEditorStyle(.plain)
                         .scrollContentBackground(.hidden)
                         .padding(.horizontal, -5)  // the editor's own text margin, so it lines up with the translation
                         .scrollIndicators(.never)  // scrolls with the trackpad; cut-off text shows there's more
-                        .scrollBounceBehavior(.basedOnSize)  // no rubber-banding when the text fits (or is empty)
+                        // Rubber-bands like any text view, but not with just the placeholder showing.
+                        .scrollBounceBehavior(m.input.isEmpty ? .basedOnSize : .always)
                         .focused($focused)
                     if m.input.isEmpty { Text("Enter text").foregroundStyle(.tertiary).allowsHitTesting(false) }
                 }
             }
             .font(.body)
             .background(alignment: .topLeading) {  // the text's own height, for sizing the areas
-                Text(m.input.isEmpty ? " " : m.input).fixedSize(horizontal: false, vertical: true).hidden()
-                    .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { inputHeight = $0 }
+                Group {
+                    if m.reading, m.slowReading { slowReadingNote } else { Text(m.input.isEmpty ? " " : m.input) }
+                }
+                .fixedSize(horizontal: false, vertical: true).hidden()
+                .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { inputHeight = $0 }
             }
             .padding([.horizontal, .top], 12)  // little below: the bar under it has its own spacing
             .padding(.bottom, 4)
             .padding(.trailing, 22)  // room for the window's ⓧ; also in the popover, so text doesn't reflow on detach
             .frame(minHeight: detached ? 0 : areas.top, maxHeight: areas.top, alignment: .topLeading)  // see `areas`
             bar(dividerBelow: true) {
-                Picker("From", selection: languageBinding(\.source)) {
+                Picker("From", selection: Binding(get: { m.effectiveSource }, set: { m.choose(source: $0) })) {
                     Text(m.detected.map { String(localized: "\(Translator.name($0)) (Detected)") } ?? String(localized: "Detect Language")).tag("")
                     Divider()
                     languageItems
                 }
                 Spacer(minLength: 4)
-                speakButton("source", m.input, m.source.isEmpty ? m.detected : Locale.Language(identifier: m.source))
+                speakButton("source", m.input, m.effectiveSource.isEmpty ? m.detected : Locale.Language(identifier: m.effectiveSource))
                 Button("Swap Languages", systemImage: "arrow.up.arrow.down") { m.swapLanguages() }
                     .help("Swap Languages")
-                    .disabled((m.source.isEmpty && m.detected == nil) || (m.target.isEmpty && m.usedTarget == nil))
+                    .disabled((m.effectiveSource.isEmpty && m.detected == nil) || (m.shownTarget.isEmpty && m.usedTarget == nil))
                 copyButton("Copy Text", m.input)
             }
             ScrollView {
                 VStack(alignment: .leading, spacing: 6) {
                     if m.translating && m.output.isEmpty {
                         status("Translating…")
+                    } else if m.output.isEmpty {
+                        Text("Translation").foregroundStyle(.secondary)
                     } else {
-                        Text(m.output.isEmpty ? String(localized: "Translation") : m.output)
-                            .foregroundStyle(m.output.isEmpty || m.failed ? .secondary : .primary)
-                            .textSelection(.enabled)
+                        SelectableText(text: m.output, secondary: m.failed)
                     }
                     if m.needsSetup {
                         Button("Download in Language & Region › Translation Languages…") { Translator.openLanguageSettings() }
@@ -76,11 +98,11 @@ struct TranslatorView: View {
                 .padding(.bottom, 4)
             }
             .scrollIndicators(.never)
-            .scrollBounceBehavior(.basedOnSize)
+            .scrollBounceBehavior(m.output.isEmpty ? .basedOnSize : .always)  // not for the placeholder or a status
             .frame(minHeight: detached ? 0 : areas.bottom, maxHeight: areas.bottom)
             bar(dividerBelow: false) {
-                Picker("To", selection: languageBinding(\.target)) {
-                    Text(m.usedTarget.map { String(localized: "\(Translator.name($0)) (Automatic)") } ?? String(localized: "Automatic")).tag("")
+                Picker("To", selection: Binding(get: { m.shownTarget }, set: { m.choose(target: $0) })) {
+                    Text(m.automaticTarget.map { String(localized: "\(Translator.name($0)) (Automatic)") } ?? String(localized: "Automatic")).tag("")
                     Divider()
                     languageItems
                 }
@@ -113,8 +135,18 @@ struct TranslatorView: View {
         .task { if m.languages.isEmpty { await m.loadLanguages() } }
         .task(id: m.input) {  // debounce typing; skip text that's already translated
             try? await Task.sleep(for: .milliseconds(400))
-            if !Task.isCancelled, m.input != m.translatedInput { m.translate() }
+            if !Task.isCancelled, m.input != m.translatedInput, !Self.composing { m.translate() }
         }
+        // Back from System Settings (e.g. after downloading a language), try a failed translation again.
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            if m.failed, !m.reading, !m.input.isEmpty { m.translate() }
+        }
+    }
+
+    /// An input method such as Pinyin has unconfirmed text: translating "nihao" would be noise.
+    /// Confirming it changes the text, which translates it then.
+    private static var composing: Bool {
+        (NSApp.keyWindow?.firstResponder as? NSTextView)?.hasMarkedText() ?? false
     }
 
     /// Heights of the two text areas. Popover: each as tall as the longer text, up to the room on screen.
@@ -159,11 +191,6 @@ struct TranslatorView: View {
         DispatchQueue.main.async { selection = TextSelection(insertionPoint: m.input.endIndex) }
     }
 
-    /// The menus save the user's choice; a screenshot switching to detection doesn't.
-    private func languageBinding(_ key: ReferenceWritableKeyPath<Model, String>) -> Binding<String> {
-        Binding(get: { m[keyPath: key] }, set: { m[keyPath: key] = $0; m.saveLanguages() })
-    }
-
     /// A thin bar with a language menu and icon buttons. The middle one has its hairline below, so it
     /// clearly belongs to the source text above.
     private func bar(dividerBelow: Bool, @ViewBuilder _ content: () -> some View) -> some View {
@@ -179,7 +206,32 @@ struct TranslatorView: View {
         }
         .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { [dividerBelow] h in
             // Both bars are the same height apart from the 1-pt line, so one measurement covers both.
-            if dividerBelow { barsHeight = 2 * h - 1 }
+            if dividerBelow { barsHeight = 2 * h - 1; m.barsHeight = barsHeight }
+        }
+    }
+
+    /// Shown once reading has taken over 3 s, which almost always means macOS is compiling its text
+    /// model (after an install or a macOS update) and will take about half a minute.
+    private var slowReadingNote: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            status("Preparing text recognition…")
+            VStack(alignment: .leading, spacing: 8) {
+                Group {
+                    if m.lowStorage {
+                        Text("Your Mac is low on storage, so macOS can't keep its text model and prepares it again each time. Free up some space to make this faster.")
+                    } else {
+                        Text("macOS is getting its text model ready. This happens once, and can take up to a minute.")
+                    }
+                }
+                .font(.callout)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+                if m.lowStorage {
+                    Button("Manage Storage…") { Translator.openStorageSettings() }
+                        .controlSize(.small)
+                }
+            }
+            .padding(.leading, 24)  // under the label, past the spinner
         }
     }
 
@@ -221,5 +273,42 @@ struct TranslatorView: View {
         case ..<500: 460
         default: 560
         }
+    }
+}
+
+/// Read-only text that selects like the rest of macOS: a selection running over a line break is
+/// highlighted to the right edge, not just to the end of the longest line as with SwiftUI's
+/// selectable `Text`. Also gets the system's text menu (Look Up, Translate, Share…).
+struct SelectableText: NSViewRepresentable {
+    var text: String
+    var secondary = false  // a message rather than a translation
+
+    func makeNSView(context _: Context) -> NSTextView {
+        let v = NSTextView(usingTextLayoutManager: true)
+        v.isEditable = false
+        v.isSelectable = true
+        v.drawsBackground = false
+        v.isRichText = false
+        v.textContainerInset = .zero
+        v.textContainer?.lineFragmentPadding = 0  // lines up with the source text's editor above
+        v.textContainer?.widthTracksTextView = true
+        v.isVerticallyResizable = false
+        v.isHorizontallyResizable = false
+        v.font = .preferredFont(forTextStyle: .body)  // SwiftUI's .body
+        return v
+    }
+
+    func updateNSView(_ v: NSTextView, context _: Context) {
+        if v.string != text { v.string = text }
+        v.textColor = secondary ? .secondaryLabelColor : .labelColor
+    }
+
+    /// As wide as offered, as tall as the text is at that width.
+    func sizeThatFits(_ proposal: ProposedViewSize, nsView v: NSTextView, context _: Context) -> CGSize? {
+        let width = proposal.width.flatMap { $0.isFinite ? $0 : nil } ?? 360
+        v.textContainer?.size = NSSize(width: width, height: .greatestFiniteMagnitude)
+        guard let layout = v.textLayoutManager else { return nil }
+        layout.ensureLayout(for: layout.documentRange)
+        return CGSize(width: width, height: ceil(layout.usageBoundsForTextContainer.height))
     }
 }

@@ -59,3 +59,17 @@
 "Listening…" = "Listening…";
 "Click, then press the new shortcut. Esc cancels." = "Click, then press the new shortcut. Esc cancels.";
 "Another app already uses this shortcut. Click to choose a different one." = "Another app already uses this shortcut. Click to choose a different one.";
+
+/* Added with the first-translation and detection fixes. In "This text looks like %@, not %@." the first %@ is the language the text seems to be in, the second the chosen one; reorder with %1$@ and %2$@ */
+"Preparing text recognition…" = "Preparing text recognition…";
+"macOS is getting its text model ready. This happens once, and can take up to a minute." = "macOS is getting its text model ready. This happens once, and can take up to a minute.";
+"Couldn't read the text. Try again." = "Couldn't read the text. Try again.";
+"Couldn't take the screenshot. Try again." = "Couldn't take the screenshot. Try again.";
+"Translating %@ isn't supported." = "Translating %@ isn't supported.";
+"Couldn't translate the text. Try again." = "Couldn't translate the text. Try again.";
+"This text looks like %@, not %@." = "This text looks like %@, not %@.";
+"Space" = "Space";
+
+/* Shown instead of the note above when the disk is too full for macOS to keep its text model */
+"Your Mac is low on storage, so macOS can't keep its text model and prepares it again each time. Free up some space to make this faster." = "Your Mac is low on storage, so macOS can't keep its text model and prepares it again each time. Free up some space to make this faster.";
+"Manage Storage…" = "Manage Storage…";

@@ -22,11 +22,23 @@ APP=dist/picoTranslator.app
 
 FLAGS="-c release --arch arm64 --arch x86_64 -Xswiftc -Osize"
 swift build $FLAGS
-rm -rf "$APP" dist/dmg && mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"  # keeps the other mode's output
+rm -rf "$APP" dist/dmg "dist/picoTranslator-$BUILD.dSYM" && mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"  # keeps the other mode's output
 cp "$(swift build $FLAGS --show-bin-path)/picoTranslator" "$APP/Contents/MacOS/"
 cp Info.plist "$APP/Contents/"
 cp -R Resources/. "$APP/Contents/Resources/"  # icon and translations (*.lproj)
 plutil -replace CFBundleVersion -string "$BUILD" "$APP/Contents/Info.plist"
+# The toolchain keys Xcode writes into every app it builds, which App Store Connect checks.
+XCODE_VERSION=$(xcodebuild -version | awk '/^Xcode/ {print $2}')
+XCODE_BUILD=$(xcodebuild -version | awk '/^Build version/ {print $3}')
+SDK_VERSION=$(xcrun --sdk macosx --show-sdk-version)
+SDK_BUILD=$(xcrun --sdk macosx --show-sdk-build-version)
+for kv in "DTXcode $(echo "$XCODE_VERSION" | awk -F. '{printf "%02d%d%d", $1, $2, $3}')" "DTXcodeBuild $XCODE_BUILD" \
+          "DTSDKName macosx$SDK_VERSION" "DTSDKBuild $SDK_BUILD" "DTPlatformName macosx" "DTPlatformVersion $SDK_VERSION" \
+          "DTPlatformBuild $SDK_BUILD" "DTCompiler com.apple.compilers.llvm.clang.1_0" "BuildMachineOSBuild $(sw_vers -buildVersion)"; do
+    plutil -replace "${kv%% *}" -string "${kv#* }" "$APP/Contents/Info.plist"
+done
+# Debug symbols, kept per build so crash reports for this build can be symbolicated. Before stripping.
+dsymutil "$APP/Contents/MacOS/picoTranslator" -o "dist/picoTranslator-$BUILD.dSYM"
 strip -x "$APP/Contents/MacOS/picoTranslator"
 
 if [ "$MODE" = appstore ]; then
@@ -37,12 +49,15 @@ if [ "$MODE" = appstore ]; then
     # The App Store also needs the app and team identifiers, taken from the profile.
     TEAM=$(security cms -D -i "$PROFILE" | plutil -extract TeamIdentifier.0 raw -o - -)
     BUNDLE_ID=$(plutil -extract CFBundleIdentifier raw Info.plist)
+    PROFILE_APP_ID=$(security cms -D -i "$PROFILE" | plutil -extract "Entitlements.com\\.apple\\.application-identifier" raw -o - -)
+    [ "$PROFILE_APP_ID" = "$TEAM.$BUNDLE_ID" ] || { echo "$PROFILE is for $PROFILE_APP_ID, not $TEAM.$BUNDLE_ID." >&2; exit 1; }
     cp picoTranslator.entitlements dist/appstore.entitlements
     plutil -insert "com\\.apple\\.application-identifier" -string "$TEAM.$BUNDLE_ID" dist/appstore.entitlements
     plutil -insert "com\\.apple\\.developer\\.team-identifier" -string "$TEAM" dist/appstore.entitlements
     codesign --force --options runtime --entitlements dist/appstore.entitlements -s "${APP_ID:-Apple Distribution}" "$APP"
     # The installer certificate goes by either name, depending on when it was made.
     INSTALLER_ID=${INSTALLER_ID:-$(security find-identity -v | grep -oE '"(Mac Installer Distribution|3rd Party Mac Developer Installer)[^"]*"' | head -1 | tr -d '"')}
+    [ -n "$INSTALLER_ID" ] || { echo "No Mac Installer Distribution certificate in the keychain. Set INSTALLER_ID to choose one." >&2; exit 1; }
     rm -f dist/picoTranslator.pkg
     productbuild --component "$APP" /Applications --sign "$INSTALLER_ID" dist/picoTranslator.pkg
     echo "Built dist/picoTranslator.pkg (build $BUILD). Upload it to App Store Connect with Transporter."
@@ -59,6 +74,7 @@ else
     rm -rf dist/dmg
     ATTACHED=$(hdiutil attach dist/rw.dmg -readwrite -noverify -noautoopen | grep Apple_HFS)
     DEVICE=$(echo "$ATTACHED" | awk '{print $1}')
+    trap 'hdiutil detach "$DEVICE" -quiet 2>/dev/null' EXIT  # also if arranging the window fails
     VOLUME=$(basename "$(echo "$ATTACHED" | sed 's/.*Apple_HFS[[:space:]]*//')")  # "picoTranslator 1" if one is open already
     osascript - "$VOLUME" <<'EOF'
 on run argv
@@ -84,6 +100,7 @@ end run
 EOF
     sync
     hdiutil detach "$DEVICE" -quiet
+    trap - EXIT
     hdiutil convert dist/rw.dmg -format UDZO -quiet -o dist/picoTranslator.dmg
     rm dist/rw.dmg
     codesign --timestamp -s "$ID" dist/picoTranslator.dmg

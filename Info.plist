@@ -3,6 +3,8 @@
 <plist version="1.0">
 <dict>
     <key>CFBundleDevelopmentRegion</key><string>en</string>
+    <key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
+    <key>CFBundleSupportedPlatforms</key><array><string>MacOSX</string></array>
     <key>CFBundleIdentifier</key><string>ca.encodeous.picoTranslator</string>
     <key>CFBundleName</key><string>picoTranslator</string>
     <key>CFBundleDisplayName</key><string>picoTranslator</string>

@@ -9,19 +9,21 @@
 <p align="center"><a href="README.md">English</a> · 简体中文</p>
 
 <p align="center">
-  <img src="assets/screenshots/translator-zh.png" width="560" alt="picoTranslator 将便签上的一行中文翻译成英语">
+  <img src="assets/screenshots/demo-zh.gif" width="560" alt="框选便签上的一行中文，picoTranslator 在便签正下方显示英文译文">
 </p>
 
 ## picoTranslator 真的非常轻
 
 - 应用本身比它的图标还小！
-- 空闲时内存占用约 50MB，代码约 1000 行 Swift，没有任何依赖。
+- 空闲时内存占用约 50MB，代码约 1500 行 Swift，没有任何依赖。
 - 完全基于 Apple 的原生框架。它就是一个纯粹的翻译工具，完全免费。
 
 ## 功能
 
-- 框选屏幕上任意位置的文字，即使是图片里的文字，或不允许拷贝的应用中的文字，译文都会显示在指针旁边。
+- 框选屏幕上任意位置的文字，即使是图片里的文字，或不允许拷贝的应用中的文字，译文都会显示在这段文字旁边。
 - 打开翻译器，自己输入或粘贴文字。
+- 自动识别语言，包括中文、日文或韩文与英文混合的文字。
+- 可以朗读原文或译文，也能一键拷贝。
 
 <p align="center">
   <img src="assets/screenshots/settings-zh.png" width="420" alt="picoTranslator 设置：屏幕录制权限、翻译语言、快捷键和登录时启动">
@@ -41,7 +43,7 @@ picoTranslator 位于菜单栏。第一次打开时，它会引导你完成以�
 2. **翻译语言：**翻译使用 Apple 的模型在你的 Mac 上完成，请在“系统设置 › 通用 › 语言与地区 › 翻译语言…”中下载你要用的语言。
 3. **快捷键：**按 ⌃⌥S 框选屏幕上的区域并翻译，按 ⌃⌥T 打开翻译器输入文字。两者都可以在设置中更改。按 Esc 关闭翻译器。
 
-安装后（或 macOS 更新后）的第一次截图可能需要最多一分钟，因为 macOS 要先准备文字识别模型。之后只需片刻。
+安装后（或 macOS 更新后）的第一次截图可能需要最多一分钟，因为 macOS 要先准备文字识别模型。之后只需片刻。如果你的 Mac 储存空间快满了，macOS 无法保留这个模型，每次截图都要重新准备；出现这种情况时，picoTranslator 会提示你。
 
 ## 局限与替代方案
 
@@ -65,6 +67,12 @@ open build/picoTranslator.app
 
 ```bash
 SIGN_ID="<identity>" ./build.sh
+```
+
+运行测试：
+
+```bash
+swift test
 ```
 
 ## 许可证

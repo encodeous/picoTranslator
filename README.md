@@ -9,19 +9,21 @@
 <p align="center">English · <a href="README.zh-CN.md">简体中文</a></p>
 
 <p align="center">
-  <img src="assets/screenshots/demo.gif" width="560" alt="Selecting a line of English on a sticky note, and picoTranslator showing its Chinese translation next to the cursor">
+  <img src="assets/screenshots/demo.gif" width="560" alt="Selecting a line of English on a sticky note, and picoTranslator showing its Chinese translation right below the note">
 </p>
 
 ## picoTranslator is really, really lightweight
 
 - The app is smaller than its own icon!
-- It should use about 50MB of memory while idle, and the code is ~1K lines of Swift with no dependencies.
+- It should use about 50MB of memory while idle, and the code is about ~1.5K lines of Swift with no dependencies.
 - Everything is built on Apple's native frameworks. It's just a pure translator app, completely free.
 
 ## Features
 
-- Select text anywhere on your screen, even in images or apps that don't let you copy it, and see the translation right next to your cursor.
+- Select text anywhere on your screen, even in images or apps that don't let you copy it, and see the translation right beside that text.
 - Open the translator to type or paste text yourself.
+- Automatic language detection, including mixed Chinese, Japanese or Korean with English.
+- Hear the text or its translation read aloud, and copy either with one click.
 
 <p align="center">
   <img src="assets/screenshots/settings.png" width="420" alt="picoTranslator settings: Screen Recording permission, translation languages, shortcuts and launch at login">
@@ -41,7 +43,7 @@ picoTranslator lives in the menu bar. The first time it opens, it walks you thro
 2. **Translation languages:** translations run on your Mac with Apple's models, so download the languages you use in System Settings › General › Language & Region › Translation Languages….
 3. **Shortcuts:** press ⌃⌥S to select an area of the screen and translate it, or ⌃⌥T to open the translator and type. You can change both in Settings. Press Esc to close the translator.
 
-The very first screenshot after installing (or after a macOS update) can take up to a minute, while macOS prepares its text recognition model. After that it takes a moment.
+The very first screenshot after installing (or after a macOS update) can take up to a minute, while macOS prepares its text recognition model. After that it takes a moment. If your Mac is nearly out of storage, macOS can't keep that model and prepares it again for every screenshot; picoTranslator tells you when this happens.
 
 ## Limitations and alternatives
 
@@ -65,6 +67,12 @@ This makes a size-optimized release build in `build/picoTranslator.app`, signed 
 
 ```bash
 SIGN_ID="<identity>" ./build.sh
+```
+
+To run the tests:
+
+```bash
+swift test
 ```
 
 ## License
